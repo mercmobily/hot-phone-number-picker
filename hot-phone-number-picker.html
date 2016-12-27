@@ -217,7 +217,7 @@ Minimal phone number picker
         this.allowedCodes.split(',').forEach( function( c ){
           if( found ) return;
           var l = c.length;
-          if( value.substr(0, l ) == c ) found = c;
+          if( value && value.substr(0, l ) == c ) found = c;
         });
 
         // Area code found and valid: make up `code` and `number`
