@@ -1,7 +1,9 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-input/paper-input-error.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-styles/default-theme.html">
 <link rel="import" href="../paper-styles/typography.html">
@@ -19,97 +21,75 @@ Minimal phone number picker
     <style>
       :host {
         display: block;
-        margin-top: 20px;
-        margin-bottom: 5px;
+        padding: 8px 0;
+
+        @apply(--hot-phone-number-picker);
+
+        --paper-input-container: {
+          padding-top: 0; /* No space for input labels, since we don't have them */
+        }
       }
-
-      .container {
-        @apply(--layout-flex-auto);
-        @apply(--layout-relative);
-
-        width: 100%;
-        max-width: 100%;
-      }
-
       label {
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 0;
-        width: 100%;
-        font: inherit;
-        color: var(--hot-phone-number-picker-label-color, --secondary-text-color);
-        -webkit-transition: -webkit-transform 0.25s, width 0.25s;
-        transition: transform 0.25s, width 0.25s;
-        -webkit-transform-origin: left top;
-        transform-origin: left top;
+        display: block;
+        color: var(--hot-phone-number-picker-color, --secondary-text-color);
 
-        -webkit-transform: translateY(-25%) scale(0.75);
-        transform: translateY(-25%) scale(0.75);
-        width: 133%;
-
-        @apply(--paper-font-common-nowrap);
-        @apply(--paper-font-subhead);
+        @apply(--paper-font-caption)
       }
-
-      ..code, .number {
-        display: inline-block;
+      .inputs {
+        @apply(--layout-horizontal);
       }
-      .code {
-        width: 6em;
+      paper-dropdown-menu {
+        margin-right: 8px;
+        -ms-flex: var(--hot-phone-number-picker-code-flex, 2);
+        -webkit-flex: var(--hot-phone-number-picker-code-flex, 2);
+        flex: var(--hot-phone-number-picker-code-flex, 2);
       }
-      .number {
-        width: 4em;
+      paper-input {
+        -ms-flex: var(--hot-phone-number-picker-number-flex, 3);
+        -webkit-flex: var(--hot-phone-number-picker-number-flex, 3);
+        flex: var(--hot-phone-number-picker-number-flex, 3);
       }
-
     </style>
 
+    <label>{{label}}</label>
 
-    <div class="container">
-      <label>{{label}}</label>
+    <div class="inputs">
+      <paper-dropdown-menu value="[[code]]" id="code" value="[[code]]" class="code" label="Int. code" no-label-float>
+        <paper-listbox id="codeListbox" class="dropdown-content" attr-for-selected="value" selected="{{code}}">
+          <paper-item value="61">+61 Australia</paper-item>
+          <paper-item value="44">+44 United Kingdom</paper-item>
+          <paper-item value="1">+1 United States</paper-item>
+        </paper-listbox>
+      </paper-dropdown-menu>
 
+      <paper-input type="number" name="number" vname="number" prevent-invalid-input id="number" label="Your phone number" value="{{number}}" required no-label-float></paper-input>
+    </div>
 
     <template is="dom-if" if="[[invalid]]">
-      <div class="error">[[errorMessage]]</div>
+      <paper-input-error aria-live="assertive">[[errorMessage]]</paper-input-error>
     </template>
-
-    <paper-dropdown-menu value="[[code]]" id="code" value="[[code]]" class="code" label="Int. code">
-      <paper-listbox id="codeListbox" class="dropdown-content" attr-for-selected="value" selected="{{code}}">
-        <paper-item value="61">+61 Australia</paper-item>
-        <paper-item value="44">+44 United Kingdom</paper-item>
-        <paper-item value="1">+1 United States</paper-item>
-      </paper-listbox>
-    </paper-dropdown-menu>
-
-    <paper-input type="number" name="number" vname="number" prevent-invalid-input id="number" label="Your phone number" value="{{number}}" required></paper-input>
-
   </template>
 
   <script>
     Polymer({
-
       is: 'hot-phone-number-picker',
 
       properties: {
-
         code: {
-          type: String,
+          type: String
         },
         number: {
-          type: String,
+          type: String
         },
-
         allowedCodes: {
           type: String,
-          default: '',
+          default: ''
         },
-
         invalid: {
           type: Boolean,
           default: false,
           observer: '_invalidChanged'
-        },
-
+        }
       },
 
       behaviors: [
@@ -248,7 +228,6 @@ Minimal phone number picker
        * set (if the parent is required, or if at least ONE sibling is set)
       */
       validate: function(){
-
         this.$.code.validate();
         this.$.number.validate();
 
@@ -263,7 +242,6 @@ Minimal phone number picker
         this.invalid = this.$.code.invalid || this.$.number.invalid;
         return !this.invalid;
       }
-
     });
   </script>
 </dom-module>
