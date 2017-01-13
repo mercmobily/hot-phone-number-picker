@@ -86,9 +86,8 @@ Minimal phone number picker
       </paper-input>
     </div>
 
-    <template is="dom-if" if="[[invalid]]">
-      <paper-input-error aria-live="assertive">[[errorMessage]]</paper-input-error>
-    </template>
+    <paper-input-error aria-live="assertive" invalid$="[[invalid]]">[[errorMessage]]</paper-input-error>
+
   </template>
 
   <script>
@@ -96,16 +95,23 @@ Minimal phone number picker
       is: 'hot-phone-number-picker',
 
       properties: {
+
         code: String,
         number: String,
+
         allowedCodes: {
           type: String,
-          default: ''
+          value: ''
         },
         invalid: {
           type: Boolean,
-          default: false,
+          value: false,
           observer: '_invalidChanged'
+        },
+        errorMessage: {
+          type: String,
+          value: "Invalid!",
+          observer: '_testing'
         }
       },
 
