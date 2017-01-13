@@ -27,18 +27,22 @@ Minimal phone number picker
 
         --paper-input-container: {
           padding-top: 0; /* No space for input labels, since we don't have them */
-        }
+        };
       }
       label {
         display: block;
-        color: var(--hot-phone-number-picker-color, --secondary-text-color);
-
-        @apply(--paper-font-caption)
+        @apply(--paper-font-caption);
+        color: var(--secondary-text-color);
       }
-      .inputs {
+      .container {
         @apply(--layout-horizontal);
       }
       paper-dropdown-menu {
+        margin-right: 8px;
+        -ms-flex: var(--hot-phone-number-picker-code-flex, 2);
+        -webkit-flex: var(--hot-phone-number-picker-code-flex, 2);
+        flex: var(--hot-phone-number-picker-code-flex, 2);
+
         --paper-input-container-input: {
           box-sizing: border-box;
           margin-bottom: -1px;
@@ -46,11 +50,6 @@ Minimal phone number picker
           border-right: 0;
           padding: 0.5rem;
         };
-
-        margin-right: 8px;
-        -ms-flex: var(--hot-phone-number-picker-code-flex, 2);
-        -webkit-flex: var(--hot-phone-number-picker-code-flex, 2);
-        flex: var(--hot-phone-number-picker-code-flex, 2);
       }
       paper-input {
         -ms-flex: var(--hot-phone-number-picker-number-flex, 3);
@@ -61,16 +60,30 @@ Minimal phone number picker
 
     <label>{{label}}</label>
 
-    <div class="inputs">
-      <paper-dropdown-menu value="[[code]]" id="code" value="[[code]]" class="code" label="Int. code" no-label-float>
-        <paper-listbox id="codeListbox" class="dropdown-content" attr-for-selected="value" selected="{{code}}">
+    <div class="container">
+      <paper-dropdown-menu id="code"
+          value="[[code]]"
+          label="Int. code"
+          no-label-float>
+        <paper-listbox id="codeListbox"
+            class="dropdown-content"
+            attr-for-selected="value"
+            selected="{{code}}">
           <paper-item value="61">+61 Australia</paper-item>
           <paper-item value="44">+44 United Kingdom</paper-item>
           <paper-item value="1">+1 United States</paper-item>
         </paper-listbox>
       </paper-dropdown-menu>
 
-      <paper-input type="number" name="number" vname="number" prevent-invalid-input id="number" label="Your phone number" value="{{number}}" required no-label-float></paper-input>
+      <paper-input id="number"
+          type="number"
+          name="number"
+          label="Your phone number"
+          value="{{number}}"
+          prevent-invalid-input
+          required
+          no-label-float>
+      </paper-input>
     </div>
 
     <template is="dom-if" if="[[invalid]]">
@@ -83,12 +96,8 @@ Minimal phone number picker
       is: 'hot-phone-number-picker',
 
       properties: {
-        code: {
-          type: String
-        },
-        number: {
-          type: String
-        },
+        code: String,
+        number: String,
         allowedCodes: {
           type: String,
           default: ''
@@ -109,27 +118,24 @@ Minimal phone number picker
         '_phoneNumberChanged(code,number)',
       ],
 
-      _oneFieldSet: function(){
-        return !!( this.$.code.value || this.$.number.value );
+      _oneFieldSet: function() {
+        return !!(this.$.code.value || this.$.number.value);
       },
 
-      ready: function(){
-
-        //this._labelExtra= this.valueSetConfirmation;
+      ready: function() {
         var el = this;
 
-        this.$.number.inputElement.validate = function(){
-
+        this.$.number.inputElement.validate = function() {
           // Value is empty: invalid if main element is required or one field
           // is set
-          if( this.value == '' ){
+          if (this.value === '') {
             this.invalid = !!el.required || el._oneFieldSet();
             return !this.invalid;
           }
 
           // Check that number starts with '04' if it's Australian number, puke
-          if( el.$.codeListbox.selected == '61' ){
-            if( this.value.substr( 0, 2 ) != '04' || this.value.length != 10 ){
+          if (el.$.codeListbox.selected == '61') {
+            if (this.value.substr(0, 2) != '04' || this.value.length != 10) {
               this.invalid = true;
               return !this.invalid;
             }
@@ -140,26 +146,25 @@ Minimal phone number picker
         };
 
 
-        this.$.code.validate = function(){
+        this.$.code.validate = function() {
 
           var value = el.$.codeListbox.selected;
 
           // Value is empty: invalid if main element is required or one field
           // is set
-
-          if( !value || value == '' ){
+          if (!value || value === '') {
             this.invalid = !!el.required || el._oneFieldSet();
             return !this.invalid;
           }
 
           // Check if the country code is allowed
           var allowed = false;
-          el.allowedCodes.split(',').forEach( function( c ){
-            if( allowed ) return;
-            if( value == c ) allowed = true;
-          } );
+          el.allowedCodes.split(',').forEach(function(c) {
+            if (allowed) return;
+            if (value == c) allowed = true;
+          });
 
-          if( !allowed ){
+          if (!allowed) {
             this.invalid = true;
             return !this.invalid;
           }
@@ -170,19 +175,16 @@ Minimal phone number picker
         };
       },
 
-
       /*
        * Reflect changes to code or number back to the global element's value
-       *
-      */
-      _phoneNumberChanged: function( code, number ){
-
+       */
+      _phoneNumberChanged: function(code, number) {
         this._protectCodeNumber = true;
 
-        if( !this.code || !this.number ){
+        if (!this.code || !this.number) {
           this.value = '';
         } else {
-          this.value = this.code + ( this.number.substr( 0, 1 ) == '0' ? this.number.substr( 1 ) : this.number );
+          this.value = this.code + (this.number.substr(0, 1) == '0' ? this.number.substr(1) : this.number);
         }
 
         this._protectCodeNumber = false;
@@ -193,41 +195,36 @@ Minimal phone number picker
        * Reflect changes to value back to code and number
        * This actively looks for an area code, and -- if found -- splits
        * the value amongst `code` and `number`
-       *
-      */
-      _valueChanged: function( value ){
+       */
+      _valueChanged: function(value) {
         var m;
 
-        if( this._protectCodeNumber) return;
+        if (this._protectCodeNumber) return;
 
         // Extract the area code
         var found = false;
-        this.allowedCodes.split(',').forEach( function( c ){
-          if( found ) return;
+        this.allowedCodes.split(',').forEach(function(c) {
+          if (found) return;
           var l = c.length;
-          if( value && value.substr(0, l ) == c ) found = c;
+          if (value && value.substr(0, l) == c) found = c;
         });
 
         // Area code found and valid: make up `code` and `number`
-        if( found ){
+        if (found) {
           this.code = found;
-          this.number = '0' + value.substr( found.length );
+          this.number = '0' + value.substr(found.length);
         } else {
           this.code = '';
           this.number = '';
         }
-
       },
 
-      // If invalid is set to "true", it will artificially invalidate _all_ fields
-      _invalidChanged: function(){
-        if( this.invalid ){
-          this.$.code.invalid = true;
-          this.$.number.invalid = true;
-        } else {
-          this.$.code.invalid = true;
-          this.$.number.invalid = true;
-        }
+      /*
+       * If invalid is set to "true", it will artificially invalidate _all_ fields
+       */
+      _invalidChanged: function() {
+        this.$.code.invalid = this.invalid || false;
+        this.$.number.invalid = this.invalid || false;
       },
 
       /*
@@ -235,13 +232,13 @@ Minimal phone number picker
        * sub-elements. They will do all of work of checking if they should be
        * set (if the parent is required, or if at least ONE sibling is set)
       */
-      validate: function(){
+      validate: function() {
         this.$.code.validate();
         this.$.number.validate();
 
         // If MAIN element is required and it's not set,
         // it returns "false"
-        if( this.required && !this.value ){
+        if (this.required && !this.value) {
           this.invalid = true;
           return false;
         }
