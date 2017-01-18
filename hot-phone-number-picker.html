@@ -27,6 +27,7 @@ Minimal phone number picker
 
         --paper-input-container: {
           padding-top: 0; /* No space for input labels, since we don't have them */
+          padding-bottom: 0;
         };
       }
       label {
@@ -86,8 +87,9 @@ Minimal phone number picker
       </paper-input>
     </div>
 
-    <paper-input-error aria-live="assertive" invalid$="[[invalid]]">[[errorMessage]]</paper-input-error>
-
+    <template is="dom-if" if="[[errorMessage]]">
+      <paper-input-error aria-live="assertive" invalid$="[[invalid]]">[[errorMessage]]</paper-input-error>
+    </template>
   </template>
 
   <script>
