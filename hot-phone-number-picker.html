@@ -93,167 +93,166 @@ Minimal phone number picker
   </template>
 
   <script>
-    Polymer({
-      is: 'hot-phone-number-picker',
+  /* global Polymer */
+  Polymer({
+    is: 'hot-phone-number-picker',
 
-      properties: {
+    properties: {
 
-        code: String,
-        number: String,
+      code: String,
+      number: String,
 
-        allowedCodes: {
-          type: String,
-          value: ''
-        },
-        invalid: {
-          type: Boolean,
-          value: false,
-          observer: '_invalidChanged'
-        },
-        errorMessage: {
-          type: String,
-          value: "Invalid!",
-        }
+      allowedCodes: {
+        type: String,
+        value: ''
       },
 
-      behaviors: [
-        Polymer.IronFormElementBehavior
-      ],
-
-      observers: [
-        '_valueChanged(value)',
-        '_phoneNumberChanged(code,number)',
-      ],
-
-      _oneFieldSet: function() {
-        return !!(this.$.code.value || this.$.number.value);
+      invalid: {
+        type: Boolean,
+        value: false,
+        observer: '_invalidChanged'
       },
-
-      ready: function() {
-        var el = this;
-
-        this.$.number.inputElement.validate = function() {
-          // Value is empty: invalid if main element is required or one field
-          // is set
-          if (this.value === '') {
-            this.invalid = !!el.required || el._oneFieldSet();
-            return !this.invalid;
-          }
-
-          // Check that number starts with '04' if it's Australian number, puke
-          if (el.$.codeListbox.selected == '61') {
-            if (this.value.substr(0, 2) != '04' || this.value.length != 10) {
-              this.invalid = true;
-              return !this.invalid;
-            }
-          }
-
-          this.invalid = false;
-          return !this.invalid;
-        };
-
-
-        this.$.code.validate = function() {
-
-          var value = el.$.codeListbox.selected;
-
-          // Value is empty: invalid if main element is required or one field
-          // is set
-          if (!value || value === '') {
-            this.invalid = !!el.required || el._oneFieldSet();
-            return !this.invalid;
-          }
-
-          // Check if the country code is allowed
-          var allowed = false;
-          el.allowedCodes.split(',').forEach(function(c) {
-            if (allowed) return;
-            if (value == c) allowed = true;
-          });
-
-          if (!allowed) {
-            this.invalid = true;
-            return !this.invalid;
-          }
-
-          // All good.
-          this.invalid = false;
-          return !this.invalid;
-        };
-      },
-
-      /*
-       * Reflect changes to code or number back to the global element's value
-       */
-      _phoneNumberChanged: function(code, number) {
-        this._protectCodeNumber = true;
-
-        if (!this.code || !this.number) {
-          this.value = '';
-        } else {
-          this.value = this.code + (this.number.substr(0, 1) == '0' ? this.number.substr(1) : this.number);
-        }
-
-        this._protectCodeNumber = false;
-        this.validate();
-      },
-
-      /*
-       * Reflect changes to value back to code and number
-       * This actively looks for an area code, and -- if found -- splits
-       * the value amongst `code` and `number`
-       */
-      _valueChanged: function(value) {
-        var m;
-
-        if (this._protectCodeNumber) return;
-
-        // Extract the area code
-        var found = false;
-        this.allowedCodes.split(',').forEach(function(c) {
-          if (found) return;
-          var l = c.length;
-          if (value && value.substr(0, l) == c) found = c;
-        });
-
-        // Area code found and valid: make up `code` and `number`
-        if (found) {
-          this.code = found;
-          this.number = '0' + value.substr(found.length);
-        } else {
-          this.code = '';
-          this.number = '';
-        }
-      },
-
-      /*
-       * If invalid is set to "true", it will artificially invalidate _all_ fields
-       */
-      _invalidChanged: function() {
-        this.$.code.invalid = this.invalid || false;
-        this.$.number.invalid = this.invalid || false;
-      },
-
-      /*
-       * Validate function; validation is TOTALLY delegated to the
-       * sub-elements. They will do all of work of checking if they should be
-       * set (if the parent is required, or if at least ONE sibling is set)
-      */
-      validate: function() {
-        this.$.code.validate();
-        this.$.number.validate();
-
-        // If MAIN element is required and it's not set,
-        // it returns "false"
-        if (this.required && !this.value) {
-          this.invalid = true;
-          return false;
-        }
-
-        // It's set as invalid if any one of the fields is invalid
-        this.invalid = this.$.code.invalid || this.$.number.invalid;
-        return !this.invalid;
+      errorMessage: {
+        type: String,
+        value: 'Invalid!'
       }
-    });
+    },
+
+    behaviors: [
+      Polymer.IronFormElementBehavior
+    ],
+
+    observers: [
+      '_valueChanged(value)',
+      '_phoneNumberChanged(code,number)'
+    ],
+
+    _oneFieldSet: function () {
+      return !!(this.$.code.value || this.$.number.value)
+    },
+
+    ready: function () {
+      var el = this
+
+      this.$.number.inputElement.validate = function () {
+        // Value is empty: invalid if main element is required or one field
+        // is set
+        if (this.value === '') {
+          this.invalid = !!el.required || el._oneFieldSet()
+          return !this.invalid
+        }
+
+        // Check that number starts with '04' if it's Australian number, puke
+        if (el.$.codeListbox.selected === '61') {
+          if (this.value.substr(0, 2) !== '04' || this.value.length !== 10) {
+            this.invalid = true
+            return !this.invalid
+          }
+        }
+
+        this.invalid = false
+        return !this.invalid
+      }
+
+      this.$.code.validate = function () {
+        var value = el.$.codeListbox.selected
+
+        // Value is empty: invalid if main element is required or one field
+        // is set
+        if (!value || value === '') {
+          this.invalid = !!el.required || el._oneFieldSet()
+          return !this.invalid
+        }
+
+        // Check if the country code is allowed
+        var allowed = false
+        el.allowedCodes.split(',').forEach(function (c) {
+          if (allowed) return
+          if (value === c) allowed = true
+        })
+
+        if (!allowed) {
+          this.invalid = true
+          return !this.invalid
+        }
+
+        // All good.
+        this.invalid = false
+        return !this.invalid
+      }
+    },
+
+    /*
+     * Reflect changes to code or number back to the global element's value
+     */
+    _phoneNumberChanged: function (code, number) {
+      this._protectCodeNumber = true
+
+      if (!this.code || !this.number) {
+        this.value = ''
+      } else {
+        this.value = this.code + (this.number.substr(0, 1) === '0' ? this.number.substr(1) : this.number)
+      }
+
+      this._protectCodeNumber = false
+      this.validate()
+    },
+
+    /*
+     * Reflect changes to value back to code and number
+     * This actively looks for an area code, and -- if found -- splits
+     * the value amongst `code` and `number`
+     */
+    _valueChanged: function (value) {
+      if (this._protectCodeNumber) return
+
+      // Extract the area code
+      var found = false
+      this.allowedCodes.split(',').forEach(function (c) {
+        if (found) return
+        var l = c.length
+        if (value && value.substr(0, l) === c) found = c
+      })
+
+      // Area code found and valid: make up `code` and `number`
+      if (found) {
+        this.code = found
+        this.number = '0' + value.substr(found.length)
+      } else {
+        this.code = ''
+        this.number = ''
+      }
+    },
+
+    /*
+     * If invalid is set to "true", it will artificially invalidate _all_ fields
+     */
+    _invalidChanged: function () {
+      this.$.code.invalid = this.invalid || false
+      this.$.number.invalid = this.invalid || false
+    },
+
+    /*
+     * Validate function; validation is TOTALLY delegated to the
+     * sub-elements. They will do all of work of checking if they should be
+     * set (if the parent is required, or if at least ONE sibling is set)
+    */
+    validate: function () {
+      this.$.code.validate()
+      this.$.number.validate()
+
+      // If MAIN element is required and it's not set,
+      // it returns "false"
+      if (this.required && !this.value) {
+        this.invalid = true
+        return false
+      }
+
+      // It's set as invalid if any one of the fields is invalid
+      this.invalid = this.$.code.invalid || this.$.number.invalid
+      return !this.invalid
+    }
+  })
+
   </script>
 </dom-module>
