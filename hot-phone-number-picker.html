@@ -107,6 +107,11 @@ Minimal phone number picker
         value: ''
       },
 
+      defaultCode: {
+        type: String,
+        value: ''
+      },
+
       invalid: {
         type: Boolean,
         value: false,
@@ -219,7 +224,7 @@ Minimal phone number picker
         this.code = found
         this.number = '0' + value.substr(found.length)
       } else {
-        this.code = ''
+        this.code = this.defaultCode || ''
         this.number = ''
       }
     },
